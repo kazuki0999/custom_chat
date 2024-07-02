@@ -35,16 +35,16 @@ function custom_chat_box() {
 
         $unread_count = custom_chat_get_user_unread_count(get_current_user_id());
         echo<<<HTML
->>><div id="custom-chat-box">
+<div id="custom-chat-box">
         <div class="custom-chat-box-header">
             <h3>お問い合わせ</h3>
             
-            
+          
 </div>
             <div class="custom-chat-box-content">
                 <div id="chat-messages"></div>
                 <textarea name="" id="chat-input" cols="30" rows="3"></textarea>
-                <button id="chat-send-btn">Send</button>
+                <button id="chat-send-btn">送信</button>
 </div>
                                           <span class="update-plugins"><span class="plugin-count"> {$unread_count}</span></span>
 
@@ -110,6 +110,17 @@ function custom_chat_save_message() {
             'user_viewed' => 1
         )
     );
+    $name=get_user_meta($user_id,'last_name',true).' '.get_user_meta($user_id,'first_name',true);
+    $subject=<<<HTML
+        {$name}様よりメッセージがとどいています。
+HTML;
+    $body=<<<HTML
+新しいメッセージがあります
+{$message}
+HTML;
+
+
+    wp_mail(blog_info('admin_email'),$subject,$body);
 
     wp_send_json_success(array(
         'time' => $time,
@@ -333,6 +344,30 @@ function custom_chat_save_message_from_admin() {
             'user_viewed' => 0
         )
     );
+    $name=get_user_meta($user_id,'last_name',true).' '.get_user_meta($user_id,'first_name',true);
+    $email=get_userdata($user_id)->user_email;
+    $site_name=get_bloginfo("name");
+    $site_url=get_site_url();
+    $subject=<<<HTML
+        {$site_name}よりメッセージが届いています。
+HTML;
+    $body=<<<HTML
+{$name}様　{$site_name}よりメッセージが送信されました。
+--
+{$message}
+--
+返信が必要な場合は
+<a href="{$site_url}">こちらより返信おねがいします。</a>
+HTML;
+
+
+    wp_mail($email,$subject,$body);
+
+    wp_send_json_success(array(
+        'time' => $time,
+        'user_id' => $user_id,
+        'message' => $message
+    ));
 
     wp_send_json_success();
 }
