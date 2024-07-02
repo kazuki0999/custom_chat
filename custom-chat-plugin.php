@@ -130,7 +130,7 @@ HTML;
 HTML;
 
 
-    wp_mail(blog_info('admin_email'),$subject,$body);
+    wp_mail(get_bloginfo('admin_email'),$subject,$body);
 
     wp_send_json_success(array(
         'time' => $time,
