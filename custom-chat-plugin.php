@@ -59,7 +59,17 @@ add_action('wp_footer', 'custom_chat_box');
 // Plugin activation hook to create database table
 register_activation_hook(__FILE__, 'custom_chat_create_table');
 
+// データベーステーブルを削除する関数
+function custom_chat_delete_table() {
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'custom_chat_messages';
 
+    $sql = "DROP TABLE IF EXISTS $table_name;";
+    $wpdb->query($sql);
+}
+
+// プラグイン無効化時にデータベーステーブルを削除する
+register_deactivation_hook(__FILE__, 'custom_chat_delete_table');
 function custom_chat_create_table() {
     global $wpdb;
     $table_name = $wpdb->prefix . 'custom_chat_messages';
